@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import styles from './ProjectNameGenerator.module.css';
 import { generateProjectName } from '../../../../shared/generators/projectNames';
 import { stringToKey } from '../../../../shared/utils/strings';
@@ -6,7 +6,7 @@ import { stringToKey } from '../../../../shared/utils/strings';
 export function ProjectNameGenerator() {
   const [names, setNames] = useState<string[] | undefined>();
 
-  const handleGenerate = useCallback(() => {
+  const handleGenerate = () => {
     const iterations = 20;
     const generatedNames: string[] = [];
 
@@ -15,9 +15,8 @@ export function ProjectNameGenerator() {
 
       generatedNames.push(generatedName);
     }
-
-    setNames(generatedNames);
-  }, []);
+    setNames(structuredClone(generatedNames));
+  };
 
   return (
     <div>
@@ -25,10 +24,11 @@ export function ProjectNameGenerator() {
         Generate
       </button>
       <div>
+        {/* Using the index as part of the key here avoids an issue with stale entries on safari*/}
         {names ? (
           <ul className={styles['name-list']}>
-            {names.map((name) => (
-              <li key={stringToKey(name)}>{name}</li>
+            {names.map((name, idx) => (
+              <li key={`${stringToKey(name)}-${idx}`}>{name}</li>
             ))}
           </ul>
         ) : null}
